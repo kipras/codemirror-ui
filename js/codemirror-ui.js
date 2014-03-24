@@ -4,13 +4,34 @@
 */
 //var CodeMirrorUI = Class.create();
 
-function CodeMirrorUI(place, options, mirrorOptions) {
-  this.initialize(place, options, mirrorOptions);
+function CodeMirrorUI(place, options, mirrorOptions, pathToCodeMirrorLib, initCallback) {
+  var self, CodeMirror;
+
+  self = this;
+  var init = function (CodeMirror) {
+    self.initialize(place, options, mirrorOptions, CodeMirror);
+    if (typeof(initCallback) == 'function') {
+      initCallback();
+    }
+  }
+
+  if (typeof exports == "object" && typeof module == "object") {
+    // CommonJS
+    init(require(pathToCodeMirrorLib));
+  } else if (typeof define == "function" && define.amd) {
+    // AMD
+    require([pathToCodeMirrorLib], function (CodeMirror) {
+      init(CodeMirror);
+    });
+  } else {
+    // Plain browser env
+    init(CodeMirror);
+  }
 }
 
 CodeMirrorUI.prototype = {
 
-  initialize: function(textarea, options, mirrorOptions) {
+  initialize: function(textarea, options, mirrorOptions, CodeMirror) {
     var defaultOptions = {
       searchMode: 'popup', // other options are 'inline' and 'dialog'.  The 'dialog' option needs work.
       imagePath: 'images/silk',
